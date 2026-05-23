@@ -1,0 +1,3 @@
+.venv/
+whiteboard.db
+__pycache__/
