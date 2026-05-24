@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>仪表盘 · 协作白板</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header class="topbar">
+        <div class="topbar-inner">
+            <div class="brand">协作白板</div>
+            <div class="topbar-actions">
+                <span class="user-name">{{ user.username }}</span>
+                <a href="{{ url_for('routes.logout') }}" class="btn-link">退出</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard">
+        <div class="dashboard-header">
+            <h2>我的白板</h2>
+            <button class="btn-primary" id="create-btn">＋ 新建白板</button>
+        </div>
+
+        <div id="toast" class="toast"></div>
+
+        <section class="board-section">
+            <h3>我创建的</h3>
+            <div class="board-grid" id="owned-grid">
+                {% for b in owned_boards %}
+                <div class="board-card" data-id="{{ b.id }}">
+                    <div class="board-card-title">{{ b.title }}</div>
+                    <div class="board-card-meta">创建于 {{ b.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
+                    <div class="board-card-actions">
+                        <a href="{{ url_for('routes.board_view', board_id=b.id) }}" class="btn-ghost">打开</a>
+                        <button class="btn-danger btn-sm delete-btn" data-id="{{ b.id }}">删除</button>
+                    </div>
+                    <div class="board-card-invite">
+                        <span>邀请链接：</span>
+                        <input type="text" readonly value="{{ url_for('routes.join_by_token', token=b.invite_token, _external=True) }}">
+                    </div>
+                </div>
+                {% endfor %}
+                {% if not owned_boards %}
+                <p class="empty-tip">还没有白板，点击右上角「新建白板」创建第一个吧。</p>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="board-section">
+            <h3>我加入的</h3>
+            <div class="board-grid" id="joined-grid">
+                {% for b in joined_boards %}
+                {% if b.owner_id != user.id %}
+                <div class="board-card">
+                    <div class="board-card-title">{{ b.title }}</div>
+                    <div class="board-card-meta">来自他人邀请</div>
+                    <div class="board-card-actions">
+                        <a href="{{ url_for('routes.board_view', board_id=b.id) }}" class="btn-ghost">打开</a>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+
+    <div class="modal" id="create-modal" hidden>
+        <div class="modal-card">
+            <h3>新建白板</h3>
+            <label>标题</label>
+            <input type="text" id="new-title" placeholder="输入白板标题" value="未命名白板">
+            <div class="modal-actions">
+                <button class="btn-ghost" id="cancel-create">取消</button>
+                <button class="btn-primary" id="confirm-create">创建</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>

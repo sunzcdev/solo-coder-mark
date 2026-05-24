@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ board.title }} · 协作白板</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="board-body">
+    <header class="board-topbar">
+        <div class="board-topbar-inner">
+            <a href="{{ url_for('routes.dashboard') }}" class="btn-link">← 返回</a>
+            <input type="text" class="board-title-input" id="board-title" value="{{ board.title }}" readonly>
+            <div class="board-topbar-right">
+                <span class="conn-status" id="conn-status">连接中…</span>
+                <span class="user-name">{{ user.username }}</span>
+                <a href="{{ url_for('routes.logout') }}" class="btn-link">退出</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="board-layout">
+        <aside class="toolbar">
+            <div class="tool-group">
+                <button class="tool-btn active" data-tool="pen" title="画笔">
+                    <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 000-1.41l-2.34-2.34a1 1 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                </button>
+                <button class="tool-btn" data-tool="rect" title="矩形">
+                    <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M4 4h16v16H4z" fill-opacity="0" stroke="currentColor" stroke-width="2"/></svg>
+                </button>
+                <button class="tool-btn" data-tool="circle" title="圆形">
+                    <svg viewBox="0 0 24 24" width="20" height="20"><circle cx="12" cy="12" r="8" fill-opacity="0" stroke="currentColor" stroke-width="2"/></svg>
+                </button>
+            </div>
+
+            <div class="tool-divider"></div>
+
+            <div class="tool-group">
+                <label class="tool-label">颜色</label>
+                <div class="color-row">
+                    <button class="color-dot active" data-color="#000000" style="background:#000000"></button>
+                    <button class="color-dot" data-color="#e53935" style="background:#e53935"></button>
+                    <button class="color-dot" data-color="#1e88e5" style="background:#1e88e5"></button>
+                    <button class="color-dot" data-color="#43a047" style="background:#43a047"></button>
+                    <button class="color-dot" data-color="#fdd835" style="background:#fdd835"></button>
+                    <button class="color-dot" data-color="#8e24aa" style="background:#8e24aa"></button>
+                    <input type="color" id="custom-color" class="color-picker" value="#000000" title="自定义颜色">
+                </div>
+            </div>
+
+            <div class="tool-divider"></div>
+
+            <div class="tool-group">
+                <label class="tool-label">粗细 <span id="width-val">3</span>px</label>
+                <input type="range" id="width-slider" min="1" max="40" value="3">
+            </div>
+
+            <div class="tool-divider"></div>
+
+            <div class="tool-group">
+                <button class="action-btn" id="undo-btn" title="撤销">↶ 撤销</button>
+                <button class="action-btn" id="redo-btn" title="重做">↷ 重做</button>
+                <button class="action-btn danger" id="clear-btn" title="清空">清空画布</button>
+            </div>
+        </aside>
+
+        <div class="canvas-wrap">
+            <canvas id="board-canvas"></canvas>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script>
+        window.__BOARD__ = {
+            id: {{ board.id | tojson }},
+            title: {{ board.title | tojson }},
+            inviteLink: {{ url_for('routes.join_by_token', token=board.invite_token, _external=True) | tojson }},
+            user: {{ user.username | tojson }}
+        };
+    </script>
+    <script src="{{ url_for('static', filename='js/board.js') }}"></script>
+</body>
+</html>
